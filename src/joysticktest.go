@@ -14,8 +14,8 @@ import (
 // MQTT
 
 type controller struct {
-	axis   []int
-	button []int
+	axis   []uint32
+	button []uint32
 }
 
 //define a function for the default message handler
@@ -75,7 +75,7 @@ func printAt(x, y int, s string) {
 	}
 }
 
-func readJoystick(js joystick.Joystick, c MQTT.Client, cntl controller) {
+func readJoystick(js joystick.Joystick, c MQTT.Client, cntl *controller) {
 	jinfo, err := js.Read()
 
 	if err != nil {
@@ -86,7 +86,7 @@ func readJoystick(js joystick.Joystick, c MQTT.Client, cntl controller) {
 	printAt(1, 5, "Buttons:")
 	for button := 0; button < js.ButtonCount(); button++ {
 		if jinfo.Buttons&(1<<uint32(button)) != 0 {
-			cntl.axis[1] = jinfo.Buttons & (1 << uint32(button))
+			//cntl.axis[1] = jinfo.Buttons & (1 << uint32(button))
 			printAt(10+button, 5, "X")
 		} else {
 			printAt(10+button, 5, ".")
