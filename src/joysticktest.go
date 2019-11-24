@@ -14,8 +14,8 @@ import (
 // MQTT
 
 type controller struct {
-	axis   []uint32
-	button []uint32
+	axis   [8]int
+	button [8]uint32
 }
 
 //define a function for the default message handler
@@ -96,7 +96,7 @@ func readJoystick(js joystick.Joystick, c MQTT.Client, cntl *controller) {
 	mqtt_publish(c, "axis5", fmt.Sprintf("Value: %7d", jinfo.AxisData[5]))
 
 	for axis := 0; axis < js.AxisCount(); axis++ {
-		//cntl.axis[axis] = jinfo.AxisData[axis]
+		cntl.axis[axis] = jinfo.AxisData[axis]
 		printAt(1, axis+7, fmt.Sprintf("Axis %2d Value: %7d", axis, jinfo.AxisData[axis]))
 	}
 
@@ -106,17 +106,20 @@ func readJoystick(js joystick.Joystick, c MQTT.Client, cntl *controller) {
 func init_cntl(js joystick.Joystick) *controller {
 	var cntl *controller
 	for axis := 0; axis < js.AxisCount(); axis++ {
-		cntl.axis[axis] := 0
-		printAt(1, axis+7, fmt.Sprintf("Axis %2d Value: %7d", axis, jinfo.AxisData[axis]))
+		cntl.axis[axis] = 0
 	}
-} 
+	for button := 0; button < js.ButtonCount(); button++ {
+		cntl.button[button] = 0
+	}
+	return cntl
+}
 
 func main() {
 
 	opts := mqtt_init()
 	c := mqtt_connectClient(opts)
 	// var cntl *controller
-	
+
 	jsid := 0
 	if len(os.Args) > 1 {
 		i, err := strconv.Atoi(os.Args[1])
